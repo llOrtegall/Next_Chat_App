@@ -1,9 +1,15 @@
-const express = require('express');
+// const express = require('express');
 const dotenv = require('dotenv');
-const mogoose = require('mongoose');
+// const mogoose = require('mongoose');
+// const User = require('./models/User');
+
+import express from "express";
+import { mongo } from "mongoose";
+import "./models/User.js";
+
 
 dotenv.config();
-mogoose.connect(process.env.MONGO_URL);
+mongo.connect(process.env.MONGO_URL);
 
 const app = express();
 
@@ -12,8 +18,9 @@ app.get('/test', (req, res) => {
   res.json('test ok');
 });
 
-app.post('/register', (req, res) => {
-
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  await User.create({ username, password });
 });
 
 app.listen(4040);
