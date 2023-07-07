@@ -7,7 +7,7 @@ const { json } = require('body-parser');
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL);
-jwtSecret = process.evt.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET;
 
 const app = express();
 
