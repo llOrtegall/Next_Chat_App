@@ -3,10 +3,10 @@ import { RegisterAndLogin } from '../RegisterAndLogin.jsx'
 import { UsuarioContext } from '../Auth/UserContext.jsx'
 
 export function Routes () {
-  const { username, id } = useContext(UsuarioContext)
+  const { username, id, nombres } = useContext(UsuarioContext)
 
   if (username) {
-    return 'logged in' + id
+    return 'logged in' + id + ' ' + username + ' ' + nombres
   }
 
   return (

@@ -6,7 +6,7 @@ export function RegisterAndLogin () {
   const [nombres, setNombres] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [documento, setDocumento] = useState('')
-  const { setUsername, setId } = useContext(UsuarioContext)
+  const { setUsername, setId, setNombres: setNombresWithRegister } = useContext(UsuarioContext)
 
   const registerUser = async (ev) => {
     ev.preventDefault()
@@ -14,6 +14,7 @@ export function RegisterAndLogin () {
     const { id, username } = data
     setUsername(username)
     setId(id)
+    setNombresWithRegister(nombres)
   }
 
   return (
