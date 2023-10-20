@@ -1,14 +1,19 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import { UsuarioContext } from './Auth/UserContext'
 
 export function RegisterAndLogin () {
   const [nombres, setNombres] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [documento, setDocumento] = useState('')
+  const { setUsername, setId } = useContext(UsuarioContext)
 
   const registerUser = async (ev) => {
     ev.preventDefault()
-    await axios.post('/registro', { nombres, contrasena, documento })
+    const { data } = await axios.post('/registro', { nombres, contrasena, documento })
+    const { id, username } = data
+    setUsername(username)
+    setId(id)
   }
 
   return (

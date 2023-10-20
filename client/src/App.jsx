@@ -1,4 +1,5 @@
-import { RegisterAndLogin } from './RegisterAndLogin'
+import { UserContextProvider } from './Auth/UserContext'
+import { Routes } from './Routes/Routes'
 import axios from 'axios'
 
 export function App () {
@@ -6,6 +7,8 @@ export function App () {
   axios.defaults.withCredentials = true
 
   return (
-    <RegisterAndLogin />
+    <UserContextProvider>
+      <Routes />
+    </UserContextProvider>
   )
 }

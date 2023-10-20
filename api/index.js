@@ -27,13 +27,13 @@ App.get('/test', (req, res) => {
 App.post('/registro', async (req, res) => {
   const { nombres, contrasena, documento } = req.body
   const usuario = `CP${documento}`
-  console.log(usuario)
+
   try {
     const UsuarioCreado = await UserModel.create({ nombres, usuario, contrasena, documento })
-    jwt.sign({ userId: UsuarioCreado._id }, JWT_SECRET, {}, (err, token) => {
+    jwt.sign({ userId: UsuarioCreado._id, username: UsuarioCreado.usuario }, JWT_SECRET, {}, (err, token) => {
       if (err) throw err
       res.cookie('token', token).status(201).json({
-        id: UsuarioCreado._id
+        id: UsuarioCreado._id, username: UsuarioCreado.usuario
       })
     })
   } catch (err) {
