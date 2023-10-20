@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useContext, useState } from 'react'
-import { UsuarioContext } from './Auth/UserContext'
+import { UsuarioContext } from '../Auth/UserContext'
 
 export function RegisterForm () {
   const [nombres, setNombres] = useState('')

@@ -1,6 +1,7 @@
 import { useContext } from 'react'
-import { RegisterForm } from '../RegisterForm.jsx'
+import { RegisterForm } from '../components/RegisterForm.jsx'
 import { UsuarioContext } from '../Auth/UserContext.jsx'
+import { LoginForm } from '../components/LoginForm.jsx'
 
 export function Routes () {
   const { username, id, nombres } = useContext(UsuarioContext)
@@ -10,6 +11,7 @@ export function Routes () {
   }
 
   return (
-    <RegisterForm />
+    // <RegisterForm />
+    <LoginForm />
   )
 }
