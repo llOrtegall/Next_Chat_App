@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { RegisterAndLogin } from '../RegisterAndLogin.jsx'
+import { RegisterForm } from '../RegisterForm.jsx'
 import { UsuarioContext } from '../Auth/UserContext.jsx'
 
 export function Routes () {
@@ -10,6 +10,6 @@ export function Routes () {
   }
 
   return (
-    <RegisterAndLogin />
+    <RegisterForm />
   )
 }
