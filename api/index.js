@@ -1,61 +1,47 @@
 import express from 'express'
-import dotenv from 'dotenv'
-import cookieParser from 'cookie-parser'
-import mongodb from 'mongoose'
+import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
+
 import { UserModel } from './Models/Usuario.js'
 
-dotenv.config()
+import 'dotenv/config'
 
-const PORT = 3030
-const App = express()
+const app = express()
+
+app.use(cookieParser())
+app.use(cors(
+  {
+    origin: 'http://192.168.20.26:5173',
+    credentials: true
+  }
+))
+app.use(express.json())
+
 const MONGO_URL = process.env.MONGO_URL
-const JWT_SECRET = process.env.SECRET_KEY
-const CLIENT_URL = process.env.CLIENT_URL
-App.use(express.json())
-App.use(cookieParser())
-App.use(cors({
-  credentials: true,
-  origin: CLIENT_URL
-}))
+const SECRET = process.env.SECRET
 
-mongodb.connect(MONGO_URL)
+mongoose.connect(MONGO_URL)
+  .then(() => { console.log('Connected to MongoDB') }).catch((error) => { console.log('Error connecting to MongoDB', error) })
 
-App.get('/test', (req, res) => {
-  res.json('test ok')
+app.get('/', (req, res) => {
+  res.send('Hello World')
 })
 
-App.get('/perfil', (req, res) => {
-  const token = req.cookies?.token
-  if (token) {
-    jwt.verify(token, JWT_SECRET, {}, (err, userData) => {
-      if (err) throw err
-      res.json(userData)
-    })
-  } else {
-    res.status(401).json('No Token')
-  }
-})
-
-App.post('/registro', async (req, res) => {
-  const { nombres, contrasena, documento } = req.body
-  const usuario = `CP${documento}`
-
+app.post('/register', async (req, res) => {
   try {
-    const UsuarioCreado = await UserModel.create({ nombres, usuario, contrasena, documento })
-    jwt.sign({ userId: UsuarioCreado._id, username: UsuarioCreado.usuario, nombres: UsuarioCreado.nombres }, JWT_SECRET, {}, (err, token) => {
-      if (err) throw err
-      res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({
-        id: UsuarioCreado._id, username: UsuarioCreado.usuario, nomres: UsuarioCreado.nombres
-      })
+    const { username, password } = req.body
+    const CreatedUser = await UserModel.create({ username, password })
+    jwt.sign({ userId: CreatedUser._id }, SECRET, {}, (error, token) => {
+      if (error) throw error
+      res.cookie('token', token).status(201).json('ok')
     })
-  } catch (err) {
-    if (err) throw err
-    res.status(500).json('error')
+  } catch (error) {
+    res.status(500).json({ error: error.message })
   }
 })
 
-App.listen(PORT, () => {
-  console.log(`Server Running On Port: http://localhost:${PORT}`)
+app.listen(3030, () => {
+  console.log('Server is running on http://localhost:3030')
 })

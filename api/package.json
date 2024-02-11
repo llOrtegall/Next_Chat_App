@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "node --watch Index.js"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
@@ -12,6 +12,7 @@
     "mongoose": "^7.6.3"
   },
   "devDependencies": {
+    "nodemon": "^3.0.3",
     "standard": "^17.1.0"
   },
   "eslintConfig": {

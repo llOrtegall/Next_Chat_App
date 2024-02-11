@@ -1,10 +1,8 @@
 import mongodb from 'mongoose'
 
 const UsuarioSchema = new mongodb.Schema({
-  nombres: { type: String },
-  usuario: { type: String, unique: true },
-  documento: { type: Number, unique: true },
-  contrasena: String
-}, { timestamps: true })
+  username: { type: String, unique: true },
+  password: { type: String }
+}, { timestamps: true, versionKey: false })
 
-export const UserModel = mongodb.model('Usuario', UsuarioSchema)
+export const UserModel = mongodb.model('User', UsuarioSchema)
