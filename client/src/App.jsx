@@ -1,4 +1,5 @@
-import { RegisterForm } from './components/Register'
+import { UserProvider } from './context/UserConterx'
+import { Routes } from './Routes'
 import axios from 'axios'
 
 export function App () {
@@ -6,6 +7,8 @@ export function App () {
   axios.defaults.withCredentials = true
 
   return (
-    <RegisterForm />
+    <UserProvider>
+      <Routes />
+    </UserProvider>
   )
 }
