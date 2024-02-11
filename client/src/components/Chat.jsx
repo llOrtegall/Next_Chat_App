@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { SensIcon, ChatIcon } from './Icons'
 import { Avatar } from './Avatar'
 
-export function Chat() {
+export function Chat () {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
 
@@ -29,6 +29,10 @@ export function Chat() {
     }
   }
 
+  function selectContact(userId){
+
+  }
+
   return (
     <section className="flex h-screen">
 
@@ -39,9 +43,10 @@ export function Chat() {
         </h3>
         {
           Object.keys(onlinePeople).map(userId => (
-            <section key={userId} className='border-b border-gray-100 py-2 flex items-center gap-2'>
+            <section key={userId} onClick={() => selectContact(userId)}
+              className='border-b border-gray-100 py-2 flex items-center gap-2'>
               <Avatar username={onlinePeople[userId]} userId={userId} />
-              <span>{onlinePeople[userId]}</span>
+              <span className='text-gray-800'>{onlinePeople[userId]}</span>
             </section>
           ))
         }
