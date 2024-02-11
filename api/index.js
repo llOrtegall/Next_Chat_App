@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import bycrypt from 'bcryptjs'
+import { WebSocketServer } from 'ws'
 
 import { UserModel } from './Models/Usuario.js'
 
@@ -51,7 +52,7 @@ app.post('/login', async (req, res) => {
     if (!foundUser) throw new Error('User not found')
     const isPasswordValid = bycrypt.compareSync(password, foundUser.password)
     if (!isPasswordValid) throw new Error('Invalid password')
-    jwt.sign({ userId: foundUser._id, username }, SECRET, {}, (error, token) => {
+    jwt.sign({ userId: foundUser._id, username }, SECRET, { }, (error, token) => {
       if (error) throw error
       res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({
         id: foundUser._id
@@ -74,7 +75,7 @@ app.post('/register', async (req, res) => {
         password: hasPassword
       }
     )
-    jwt.sign({ userId: CreatedUser._id, username }, SECRET, {}, (error, token) => {
+    jwt.sign({ userId: CreatedUser._id, username }, SECRET, { }, (error, token) => {
       if (error) throw error
       res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({
         id: CreatedUser._id
@@ -85,6 +86,30 @@ app.post('/register', async (req, res) => {
   }
 })
 
-app.listen(3030, () => {
+const server = app.listen(3030, () => {
   console.log('Server is running on http://localhost:3030')
+})
+
+const WebSocSer = new WebSocketServer({ server })
+
+WebSocSer.on('connection', (connection, req) => {
+  const cookies = req.headers.cookie
+  if (cookies) {
+    const tokenCoorStrg = cookies.split(';').find(str => str.startsWith('token='))
+    if (tokenCoorStrg) {
+      const token = tokenCoorStrg.split('=')[1]
+      jwt.verify(token, SECRET, {}, (error, userData) => {
+        if (error) throw error
+        const { userId, username } = userData
+        connection.userId = userId
+        connection.username = username
+      })
+    }
+  }
+
+  [...WebSocSer.clients].forEach(client => {
+    client.send(JSON.stringify({
+      online: [...WebSocSer.clients].map(client => ({ userId: client.userId, username: client.username }))
+    }))
+  })
 })
