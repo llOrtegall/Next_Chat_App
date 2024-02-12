@@ -59,6 +59,15 @@ app.get('/messages/:userId', async (req, res) => {
   }
 })
 
+app.get('/people', async (req, res) => {
+  try {
+    const users = await UserModel.find({}, { _id: 1, username: 1 })
+    res.status(200).json(users)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 app.get('/profile', async (req, res) => {
   const token = req.cookies?.token
   if (token) {

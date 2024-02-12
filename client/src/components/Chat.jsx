@@ -2,14 +2,15 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { uniqBy } from 'lodash'
 import { UserContext } from '../context/UserConterx'
 import { SensIcon, ChatIcon } from './Icons'
-import { Avatar } from './Avatar'
 import axios from 'axios'
+import { Contact } from './Contact'
 
 export function Chat () {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [newMessage, setNewMessage] = useState('')
+  const [offLineContacts, setOfLineContacts] = useState({})
   const [messages, setMessages] = useState([])
   const { id } = useContext(UserContext)
   const divUnderMessages = useRef()
@@ -77,6 +78,22 @@ export function Chat () {
   }, [messages])
 
   useEffect(() => {
+    axios.get('/people')
+      .then(res => {
+        const offLinePeopleArr = res.data
+          .filter(p => p._id !== id)
+          .filter(p => !Object.keys(onlinePeople).includes(p._id))
+
+        const offLinePeople = {}
+
+        offLinePeopleArr.forEach(p => {
+          offLinePeople[p._id] = p
+        })
+        setOfLineContacts(offLinePeople)
+      })
+  }, [onlinePeople])
+
+  useEffect(() => {
     if (selectedUserId) {
       axios.get('/messages/' + selectedUserId)
         .then(res => {
@@ -100,17 +117,27 @@ export function Chat () {
         </h3>
         {
           Object.keys(onlinePeopleExcluOurUser).map(userId => (
-            <section key={userId} onClick={() => setSelectedUserId(userId)}
-              className={`border-b border-gray-100 flex items-center gap-2 cursor-pointer ${userId === selectedUserId ? 'bg-blue-50' : ''}`}>
-              {userId === selectedUserId && (
-                <div className='w-1 bg-blue-500 h-full rounded-r-md'></div>
-              )}
-              <div className='flex gap-2 items-center py-2 pl-2'>
-                <Avatar username={onlinePeople[userId]} userId={userId} />
-                <span className='text-gray-800'>{onlinePeople[userId]}</span>
-              </div>
 
-            </section>
+            < Contact
+              key={userId}
+              id={userId}
+              online={true}
+              username={onlinePeopleExcluOurUser[userId]}
+              onClick={() => setSelectedUserId(userId)}
+              selected={userId === selectedUserId}
+            />
+          ))
+        }
+        {
+          Object.keys(offLineContacts).map(userId => (
+            <Contact
+              key={userId}
+              id={userId}
+              online={false}
+              username={offLineContacts[userId].username}
+              onClick={() => setSelectedUserId(userId)}
+              selected = {userId === selectedUserId}
+            />
           ))
         }
       </main>
