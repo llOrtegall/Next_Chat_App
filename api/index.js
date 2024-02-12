@@ -30,8 +30,33 @@ const bycryptSalt = bycrypt.genSaltSync(10)
 mongoose.connect(MONGO_URL)
   .then(() => { console.log('Connected to MongoDB') }).catch((error) => { console.log('Error connecting to MongoDB', error) })
 
-app.get('/', (req, res) => {
-  res.send('Hello World')
+async function getDataFromRequest (req) {
+  return new Promise((resolve, reject) => {
+    const token = req.cookies?.token
+    if (token) {
+      jwt.verify(token, SECRET, {}, (error, userData) => {
+        if (error) throw error
+        resolve(userData)
+      })
+    } else {
+      reject(new Error('No Token'))
+    }
+  })
+}
+
+app.get('/messages/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    const userData = await getDataFromRequest(req)
+    const outUserId = userData.userId
+    const messages = await MessageModel.find({
+      sender: { $in: [userId, outUserId] },
+      recipient: { $in: [userId, outUserId] }
+    }).sort({ createdAt: 1 })
+    res.status(200).json(messages)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
 })
 
 app.get('/profile', async (req, res) => {
@@ -126,7 +151,7 @@ WebSocSer.on('connection', (connection, req) => {
           text,
           sender: connection.userId,
           recipient,
-          id: MsnDoc._id
+          _id: MsnDoc._id
         })))
     }
   });
