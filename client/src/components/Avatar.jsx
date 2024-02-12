@@ -1,5 +1,5 @@
 export function Avatar ({ userId, username }) {
-  const colors = ['bg-red-200', 'bg-purple-200', 'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-indigo-200']
+  const colors = ['bg-red-400', 'bg-purple-400', 'bg-blue-400', 'bg-green-400', 'bg-yellow-400', 'bg-indigo-400']
 
   const userIdBase10 = parseInt(userId, 16)
   const colorIndex = userIdBase10 % colors.length

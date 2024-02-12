@@ -7,6 +7,7 @@ import bycrypt from 'bcryptjs'
 import { WebSocketServer } from 'ws'
 
 import { UserModel } from './Models/Usuario.js'
+import { MessageModel } from './Models/Messages.js'
 
 import 'dotenv/config'
 
@@ -14,7 +15,7 @@ const app = express()
 
 app.use(cors(
   {
-    origin: ['http://localhost:5173', 'http://192.168.20.26:5173'],
+    origin: ['http://localhost:5173', 'http://192.168.20.26:5173', 'http://172.20.1.110:5173'],
     credentials: true
   }
 ))
@@ -52,7 +53,7 @@ app.post('/login', async (req, res) => {
     if (!foundUser) throw new Error('User not found')
     const isPasswordValid = bycrypt.compareSync(password, foundUser.password)
     if (!isPasswordValid) throw new Error('Invalid password')
-    jwt.sign({ userId: foundUser._id, username }, SECRET, { }, (error, token) => {
+    jwt.sign({ userId: foundUser._id, username }, SECRET, {}, (error, token) => {
       if (error) throw error
       res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({
         id: foundUser._id
@@ -75,7 +76,7 @@ app.post('/register', async (req, res) => {
         password: hasPassword
       }
     )
-    jwt.sign({ userId: CreatedUser._id, username }, SECRET, { }, (error, token) => {
+    jwt.sign({ userId: CreatedUser._id, username }, SECRET, {}, (error, token) => {
       if (error) throw error
       res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({
         id: CreatedUser._id
@@ -93,6 +94,7 @@ const server = app.listen(3030, () => {
 const WebSocSer = new WebSocketServer({ server })
 
 WebSocSer.on('connection', (connection, req) => {
+  // TODO: extraer el token de las cookies y verificarlo
   const cookies = req.headers.cookie
   if (cookies) {
     const tokenCoorStrg = cookies.split(';').find(str => str.startsWith('token='))
@@ -105,8 +107,31 @@ WebSocSer.on('connection', (connection, req) => {
         connection.username = username
       })
     }
-  }
+  };
 
+  connection.on('message', async (message) => {
+    const msnData = JSON.parse(message.toString())
+    const { recipient, text } = msnData.message
+
+    if (recipient && text) {
+      const MsnDoc = await MessageModel.create({
+        sender: connection.userId,
+        recipient,
+        text
+      });
+
+      [...WebSocSer.clients]
+        .filter(c => c.userId === recipient)
+        .forEach(c => c.send(JSON.stringify({
+          text,
+          sender: connection.userId,
+          recipient,
+          id: MsnDoc._id
+        })))
+    }
+  });
+
+  // TODO: notificar a todos los clientes conectados que un nuevo usuario se ha conectado
   [...WebSocSer.clients].forEach(client => {
     client.send(JSON.stringify({
       online: [...WebSocSer.clients].map(client => ({ userId: client.userId, username: client.username }))
