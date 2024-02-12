@@ -1,16 +1,17 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { uniqBy } from 'lodash'
 import { UserContext } from '../context/UserConterx'
 import { SensIcon, ChatIcon } from './Icons'
 import { Avatar } from './Avatar'
 
-export function Chat () {
+export function Chat() {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState([])
   const { id } = useContext(UserContext)
+  const divUnderMessages = useRef()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:3030')
@@ -18,7 +19,7 @@ export function Chat () {
     ws.addEventListener('message', handleMessage)
   }, [])
 
-  function ShowOnlinePeople (peopleArray) {
+  function ShowOnlinePeople(peopleArray) {
     const people = {}
 
     peopleArray.forEach(({ userId, username }) => {
@@ -28,7 +29,7 @@ export function Chat () {
     setOnlinePeople(people)
   }
 
-  function handleMessage (event) {
+  function handleMessage(event) {
     const messageData = JSON.parse(event.data)
     if ('online' in messageData) {
       ShowOnlinePeople(messageData.online)
@@ -37,7 +38,7 @@ export function Chat () {
     }
   }
 
-  function sendMessage (e) {
+  function sendMessage(e) {
     e.preventDefault()
     ws.send(
       JSON.stringify({
@@ -56,6 +57,13 @@ export function Chat () {
       id: Date.now()
     }]))
   }
+
+  useEffect(() => {
+    const div = divUnderMessages.current
+    if (div) {
+      div.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [messages])
 
   const onlinePeopleExcluOurUser = { ...onlinePeople }
   delete onlinePeopleExcluOurUser[id]
@@ -99,7 +107,7 @@ export function Chat () {
           {
             !!selectedUserId && (
               <section className='relative h-full'>
-                <div className='overflow-y-scroll absolute inset-0'>
+                <div className='overflow-y-scroll absolute top-0 left-0 right-0 bottom-4'>
                   {messageWithoutDuper.map((message, index) => (
                     <div key={index} className={`${message.sender === id ? 'text-right' : 'text-left'}`}>
                       <div className={`inline-block p-2 my-2 rounded-md text-sm ${message.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-gray-500'}`}>
@@ -109,6 +117,7 @@ export function Chat () {
                       </div>
                     </div>
                   ))}
+                  <div ref={divUnderMessages}></div>
                 </div>
               </section>
             )
