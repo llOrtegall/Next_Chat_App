@@ -33,7 +33,7 @@ const bycryptSalt = bycrypt.genSaltSync(10)
 mongoose.connect(MONGO_URL)
   .then(() => { console.log('Connected to MongoDB') }).catch((error) => { console.log('Error connecting to MongoDB', error) })
 
-async function getDataFromRequest(req) {
+async function getDataFromRequest (req) {
   return new Promise((resolve, reject) => {
     const token = req.cookies?.token
     if (token) {
