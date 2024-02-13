@@ -22,13 +22,15 @@ export function Chat () {
   function connectToWs () {
     const ws = new WebSocket('ws://localhost:3030')
     setWs(ws)
+
     ws.addEventListener('message', handleMessage)
-    ws.addEventListener('close', () => {
-      setTimeout(() => {
-        console.log('Trying to reconnect')
-        connectToWs()
-      }, 5000)
-    })
+
+    // ws.addEventListener('close', () => {
+    //   setTimeout(() => {
+    //     console.log('Trying to reconnect')
+    //     connectToWs()
+    //   }, 5000)
+    // })
   }
 
   function logout () {

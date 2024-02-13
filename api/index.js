@@ -25,8 +25,6 @@ app.use(cookieParser())
 const MONGO_URL = process.env.MONGO_URL
 const SECRET = process.env.SECRET
 const SERVER_PORT = 3030
-const PING_INTERVAL = 5000
-const DEATH_TIMEOUT = 1000
 
 const bycryptSalt = bycrypt.genSaltSync(10)
 
@@ -140,89 +138,58 @@ const server = app.listen(SERVER_PORT, () => {
   console.log('Server is running on http://localhost:3030')
 })
 
-const WebSokectServerAppChat = new WebSocketServer({ server })
+const wss = new WebSocketServer({ server })
 
-WebSokectServerAppChat.on('connection', (connection, req) => {
-  function notifyAboutOnlinePeople () {
-    [...WebSokectServerAppChat.clients].forEach(client => {
-      client.send(JSON.stringify({
-        online: [...WebSokectServerAppChat.clients].map(client => ({ userId: client.userId, username: client.username }))
-      }))
-    })
-  }
-
-  connection.isAlive = true
-
-  connection.timer = setInterval(() => {
-    connection.ping()
-
-    if (connection.deathTimer) {
-      clearTimeout(connection.deathTimer)
-    }
-
-    connection.deathTimer = setTimeout(() => {
-      connection.isAlive = false
-      connection.terminate()
-      notifyAboutOnlinePeople()
-      console.log('dead')
-    }, DEATH_TIMEOUT)
-  }, PING_INTERVAL)
-
-  connection.on('pong', () => {
-    clearTimeout(connection.deathTimer)
-  })
-
+wss.on('connection', (connection, req) => {
+  // TODO: Read username and id the cookie and set it to the connection object
   const cookies = req.headers.cookie
   if (cookies) {
-    const tokenCoorStrg = cookies.split(';').find(str => str.startsWith('token='))
-    if (tokenCoorStrg) {
-      const token = tokenCoorStrg.split('=')[1]
-      jwt.verify(token, SECRET, {}, (error, userData) => {
-        if (error) {
-          console.error('JWT verification failed:', error)
-          connection.terminate()
-          return
-        }
-        const { userId, username } = userData
-        connection.userId = userId
-        connection.username = username
-      })
+    const tokenstring = cookies.split(';').find(str => str.startsWith('token='))
+    if (tokenstring) {
+      const token = tokenstring.split('=')[1]
+      if (token) {
+        jwt.verify(token, SECRET, {}, (error, userData) => {
+          if (error) throw error
+          const { userId, username } = userData
+          connection.userId = userId
+          connection.username = username
+        })
+      } else {
+        connection.terminate()
+      }
+    } else {
+      connection.terminate()
     }
-  }
+  };
 
   connection.on('message', async (message) => {
-    const msnData = JSON.parse(message.toString())
-    const { recipient, text } = msnData.message
-
+    // TODO: recibe los mensajes y los parsea
+    const messageData = JSON.parse(message.toString())
+    // console.log(messageData)
+    const { recipient, text } = messageData.message
     if (recipient && text) {
-      try {
-        const MsnDoc = await MessageModel.create({
+      // *: guarda el mensaje en la base de datos
+      const messageDoc = await MessageModel.create({
+        sender: connection.userId,
+        recipient,
+        text
+      });
+
+      [...wss.clients]
+        .filter(c => c.userId === recipient)
+        .forEach(c => c.send(JSON.stringify({
+          text,
           sender: connection.userId,
           recipient,
-          text
-        });
-
-        [...WebSokectServerAppChat.clients]
-          .filter(c => c.userId === recipient)
-          .forEach(c => c.send(JSON.stringify({
-            text,
-            sender: connection.userId,
-            recipient,
-            _id: MsnDoc._id
-          })))
-      } catch (error) {
-        console.error('Failed to create message:', error)
-      }
+          id: messageDoc._id
+        })))
     }
+  });
+
+  // TODO: notify everyone about online people (when someone connects)
+  [...wss.clients].forEach(client => {
+    client.send(JSON.stringify({
+      online: [...wss.clients].map(c => ({ userId: c.userId, username: c.username }))
+    }))
   })
-
-  notifyAboutOnlinePeople()
-})
-
-WebSokectServerAppChat.on('close', connection => {
-  console.log('Connection closed')
-  clearInterval(connection.timer)
-  clearTimeout(connection.deathTimer)
-  // Remove the connection from the clients set
-  WebSokectServerAppChat.clients.delete(connection)
 })
