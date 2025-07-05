@@ -10,6 +10,8 @@ export default async function Home() {
     redirect('/login');
   }
 
+  console.log(session);
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-300 flex flex-col">
       {/* Header */}
