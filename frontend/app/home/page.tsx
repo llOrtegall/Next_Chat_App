@@ -23,10 +23,9 @@ export default async function Home() {
         <Button
           onClick={async () => {
             "use server";
-            await signOut();
-            redirect('/login');
+            await signOut({ redirectTo: '/'});
           }}
-          className="bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold px-6 py-2 rounded-lg shadow hover:from-red-600 hover:to-pink-600"
+          className="cursor-pointer"
         >
           Cerrar sesión
         </Button>
