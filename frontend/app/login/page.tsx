@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { signIn } from "@/auth";
 
-export default function LoginView() {
+export default function LoginPage() {
   return (
     <section className="h-screen flex items-center justify-center">
       <div>
@@ -15,7 +15,7 @@ export default function LoginView() {
           <CardContent className="flex flex-col items-center">
             <form action={async () => {
               "use server";
-              await signIn('google')
+              await signIn('google', { redirectTo: '/home'})
             }}>
               <Button
                 variant="outline"
