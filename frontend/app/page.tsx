@@ -1,10 +1,11 @@
-import SignIn from "./components/sing-in";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
     <div className="">
-      home
-      <SignIn />
+      <Button>
+        test btn
+      </Button>
     </div>
   );
 }
