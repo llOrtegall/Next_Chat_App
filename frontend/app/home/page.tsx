@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { Header } from "@/app/home/header";
+import { Header } from "./header";
+import { Footer } from "./footer";
 import { auth } from "@/auth";
 
 export default async function Home() {
@@ -13,22 +14,29 @@ export default async function Home() {
 
   return (
     <main className="h-screen w-full flex">
-      <section className="flex w-10/12">
+      
+      <section className="w-3/12 flex flex-col h-full">
+        <header className="bg-blue-100 px-4 py-3">
+          <Header
+            key={id}
+            name={name ?? null}
+            image={image ?? null}
+            username={'no tiene'}
+          />
+        </header>
 
-        <aside className="bg-blue-100 w-3/12 px-4 py-3">
+        <section className="flex-1 overflow-auto bg-white px-4 py-2">
           usuarios
-        </aside>
-
-        <section className="bg-yellow-100 w-9/12 px-4 py-3">
-          chat
         </section>
 
+        <footer className="bg-gray-100 px-4 py-3 flex items-center justify-center">
+          <Footer />
+        </footer>
       </section>
 
-      <header className="w-2/12 bg-red-100 px-4 py-3">
-        <Header key={id} name={name} image={image} username={'not exist'} />
-      </header>
-
+      <section className="w-9/12 bg-yellow-100 px-4 py-3">
+        chat
+      </section>
     </main>
   );
 }

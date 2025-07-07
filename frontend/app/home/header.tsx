@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/auth";
 import Image from "next/image";
 
 interface HeaderProps {
@@ -11,20 +9,19 @@ interface HeaderProps {
 export const Header = async ({ name, image, username }: HeaderProps) => {
   return (
     <>
-      <div>
-        <Image src={image ?? "/avatar.svg"} alt={name ?? "User Avatar"} width={50} height={50} />
-        <h1>{name}</h1>
-        <p>{username}</p>
-      </div>
-      <Button
-        onClick={async () => {
-          "use server";
-          await signOut({ redirectTo: '/' });
-        }}
-        className="cursor-pointer"
-      >
-        Cerrar sesión
-      </Button>
+      <aside className="flex items-center gap-3 py-2">
+        <Image
+          className="rounded-full shadow-md"
+          src={image ?? "/avatar.svg"}
+          alt={name ?? "User Avatar"}
+          width={50}
+          height={50}
+        />
+        <article className="font-semibold">
+          <p>{username}</p>
+          <h1>{name}</h1>
+        </article>
+      </aside>
     </>
   )
 }
