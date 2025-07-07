@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/auth";
+import { Button } from '@/components/ui/button';
+import { signOut } from '@/auth';
 
 export const Footer = () => {
   return (
     <>
       <Button
         onClick={async () => {
-          "use server";
+          'use server';
           await signOut({ redirectTo: '/' });
         }}
-        className="cursor-pointer"
+        className='cursor-pointer'
       >
         Cerrar sesión
       </Button>
