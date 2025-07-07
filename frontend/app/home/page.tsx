@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { Header } from './header';
 import { Footer } from './footer';
 import { auth } from '@/auth';
+import { createNewUser } from '@/src';
 
 export default async function Home() {
   const session = await auth();
@@ -10,7 +11,11 @@ export default async function Home() {
     redirect('/login');
   }
 
-  const { id, name, image } = session.user;
+  const { id, name, email, image } = session.user;
+
+  const create = await createNewUser(name ?? 'test', 'test', email ?? 'test@gmail.com');
+
+  console.log(create);
 
   return (
     <main className='h-screen w-full flex'>
