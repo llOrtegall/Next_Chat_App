@@ -3,6 +3,7 @@ import { Header } from './header';
 import { Footer } from './footer';
 import { auth } from '@/auth';
 import { createNewUser } from '@/src';
+import { DialogDemo } from '@/components/dialog-user';
 
 export default async function Home() {
   const session = await auth();
@@ -19,6 +20,12 @@ export default async function Home() {
 
   return (
     <main className='h-screen w-full flex'>
+
+      {
+        create.username !== null && create.username !== undefined && create.username === 'test' ? (
+          <DialogDemo key={create.email} names={create.name} />
+        ) : null
+      }
       
       <section className='w-3/12 flex flex-col h-full'>
         <header className='bg-blue-100 px-4 py-3'>
