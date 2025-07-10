@@ -2,8 +2,10 @@ import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
+import { loginSchema } from "./lib/zod";
+import { db } from "./lib/db";
+import bcrypt from "bcryptjs";
 
-// Notice this is only an object, not a full Auth.js instance
 export default {
   providers: [
     Google({
@@ -16,30 +18,36 @@ export default {
     }),
     Credentials({
       authorize: async (credentials) => {
-        
-        console.log(credentials);
-        
-        // let user = null
 
-        // // logic to salt and hash password
-        // const pwHash = saltAndHashPassword(credentials.password)
+        const { success, data, error } = loginSchema.safeParse(credentials);
 
-        // // logic to verify if the user exists
-        // user = await getUserFromDb(credentials.email, pwHash)
-
-        // if (!user) {
-        //   // No user found, so this is their first attempt to login
-        //   // Optionally, this is also the place you could do a user registration
-        //   throw new Error("Invalid credentials.")
-        // }
-
-        // // return user object with their profile data
-        return {
-          id: "1",
-          name: "John Doe",
-          email: "john.doe@example.com"
+        if (!success) {
+          throw new Error(error?.message || "Invalid credentials.");
         }
-      },
+
+        const user = await db.user.findUnique({
+          where: {
+            email: data.email
+          }
+        });
+
+        if (!user || !user.password) {
+          throw new Error("Invalid credentials.");
+        }
+
+        const isValidPassword = await bcrypt.compare(data.password, user.password);
+
+        if (!isValidPassword) {
+          throw new Error("Invalid credentials.");
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image || null,
+        };
+      }
     }),
   ],
 } satisfies NextAuthConfig

@@ -13,11 +13,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { z } from "zod/v4";
 import { loginAction } from "@/app/actions/auth-action";
-
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { toast } from "sonner"
+import { z } from "zod/v4";
 
 const FormLogin = () => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -27,7 +32,18 @@ const FormLogin = () => {
   })
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    await loginAction(values)
+    startTransition(async () => {
+      try {
+        const response = await loginAction(values);
+        if(response?.error){
+          toast.error(response.error);
+        } else {
+          router.push("/dashboard");
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "An error occurred");
+      }
+    });
   }
 
   return (
@@ -73,6 +89,7 @@ const FormLogin = () => {
             />
             <Button
               type="submit"
+              disabled={isPending}
               className="w-full py-3 text-lg font-bold bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl shadow-lg hover:scale-105 hover:from-pink-500 hover:to-indigo-500 transition-transform duration-200"
             >
               Entrar
