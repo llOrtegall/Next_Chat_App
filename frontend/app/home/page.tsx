@@ -1,9 +1,9 @@
+import { DialogDemo } from '@/components/dialog-user';
 import { redirect } from 'next/navigation';
+import { createNewUser } from '@/src';
 import { Header } from './header';
 import { Footer } from './footer';
 import { auth } from '@/auth';
-import { createNewUser } from '@/src';
-import { DialogDemo } from '@/components/dialog-user';
 
 export default async function Home() {
   const session = await auth();
@@ -14,16 +14,14 @@ export default async function Home() {
 
   const { id, name, email, image } = session.user;
 
-  const create = await createNewUser(name ?? 'test', 'test', email ?? 'test@gmail.com');
-
-  console.log(create);
+  const create = await createNewUser(name!, email!, email!);
 
   return (
     <main className='h-screen w-full flex'>
 
       {
-        create.username !== null && create.username !== undefined && create.username === 'test' ? (
-          <DialogDemo key={create.email} names={create.name} />
+        create.username !== null && create.email !== null && create.email === create.username ? (
+          <DialogDemo key={create.email} names={create.name} email={create.email} />
         ) : null
       }
       
