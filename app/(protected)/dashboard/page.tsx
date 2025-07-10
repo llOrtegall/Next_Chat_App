@@ -1,9 +1,17 @@
-import React from 'react'
+import { auth } from "@/auth"
 
-const DashboarPage = () => {
+const DashboardPage = async () => {
+  const session = await auth()
+ 
+  if (!session) {
+    return <div>Not authenticated</div>
+  }
+ 
   return (
-    <div>DashboarPage</div>
+    <div className="container">
+      <pre>{JSON.stringify(session, null, 2)}</pre>
+    </div>
   )
 }
 
-export default DashboarPage
+export default DashboardPage
