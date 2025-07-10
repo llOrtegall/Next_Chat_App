@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod/v4";
+import { loginAction } from "@/app/actions/auth-action";
 
 
 const FormLogin = () => {
@@ -25,8 +26,8 @@ const FormLogin = () => {
     },
   })
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    await loginAction(values)
   }
 
   return (
