@@ -1,6 +1,12 @@
-import React from 'react'
+import { auth } from "@/auth"
 
-const AdminPage = () => {
+const AdminPage = async () => {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return <div>You must be logged in to view this page</div>;
+  }
+
   return (
     <div>AdminPage</div>
   )

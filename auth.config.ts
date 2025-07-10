@@ -43,6 +43,7 @@ export default {
 
         return {
           id: user.id,
+          role: user.role || null,
           name: user.name,
           email: user.email,
           image: user.image || null,
