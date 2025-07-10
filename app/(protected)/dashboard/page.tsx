@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import SignOut from "@/components/sign-out"
 
 const DashboardPage = async () => {
   const session = await auth()
@@ -10,6 +11,7 @@ const DashboardPage = async () => {
   return (
     <div className="container">
       <pre>{JSON.stringify(session, null, 2)}</pre>
+      <SignOut />
     </div>
   )
 }
