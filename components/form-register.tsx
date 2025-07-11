@@ -48,9 +48,9 @@ const FormRegister = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-      <div className="w-full max-w-md p-8 bg-white/90 rounded-2xl shadow-2xl backdrop-blur-lg border border-gray-200">
-        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6 drop-shadow-lg">Registrar Usuario</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-gray-200">
+        <h2 className="text-2xl font-semibold text-center text-gray-900 mb-8">Registrar Usuario</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -58,12 +58,12 @@ const FormRegister = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg font-semibold text-gray-700">Nombre</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Nombre</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="your names"
+                      placeholder="Jhon Doe Smith"
                       {...field}
-                      className="border-2 border-indigo-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200 rounded-lg px-4 py-2 bg-white/80 text-gray-900 shadow-sm"
+                      className="h-11 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder:text-gray-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -76,12 +76,12 @@ const FormRegister = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg font-semibold text-gray-700">Email</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="you@example.com"
+                      placeholder="email@example.com"
                       {...field}
-                      className="border-2 border-indigo-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200 rounded-lg px-4 py-2 bg-white/80 text-gray-900 shadow-sm"
+                      className="h-11 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder:text-gray-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -93,13 +93,13 @@ const FormRegister = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg font-semibold text-gray-700">Password</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Contraseña</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="********"
+                      placeholder="••••••••"
                       {...field}
-                      className="border-2 border-indigo-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition-all duration-200 rounded-lg px-4 py-2 bg-white/80 text-gray-900 shadow-sm"
+                      className="h-11 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder:text-gray-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -109,12 +109,24 @@ const FormRegister = () => {
             <Button
               type="submit"
               disabled={isPending}
-              className="w-full py-3 text-lg font-bold bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl shadow-lg hover:scale-105 hover:from-pink-500 hover:to-indigo-500 transition-transform duration-200"
+              className="w-full h-11 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Registar
+              {isPending ? "Registrando..." : "Registrar"}
             </Button>
           </form>
         </Form>
+        <section>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">¿Ya tienes una cuenta?</p>
+            <Button
+              variant="link"
+              className="text-blue-600 hover:text-blue-700 mt-2"
+              onClick={() => router.push("/login")}
+            >
+              Inicia sesión aquí
+            </Button>
+          </div>
+        </section>
       </div>
     </div>
   )
